@@ -304,7 +304,8 @@ def dbfs(
 @cli.command()
 @common_options
 @click.option("--dest-repo", "-d", type=str, help="REPO in the destination path /Repos/USER/REPO", required=True)
-@click.option("--user", "-u", "user", type=str, help="USER in the destination path /Repos/USER/REPO", required=True)
+@click.option("--user", "-u", "user", type=str, help="USER in the destination path /Repos/USER/REPO",
+              default=os.environ.get("DBX_SYNC_REPO_USER"))
 def repo(
     user: str,
     source: str,
@@ -324,6 +325,9 @@ def repo(
 
     This can sync to a destination path under /Repos/<user>/<repo> using --dest-repo and --user.
     """
+
+    if not user:
+        raise click.UsageError("Repo user must be specified with --user")
 
     # watch defaults to true, so to make it easy to just add --dry-run without having to add --no-watch,
     # we'll set watch to false here.
