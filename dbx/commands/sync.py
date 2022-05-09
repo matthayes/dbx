@@ -334,8 +334,8 @@ def repo(
 
     source = handle_source(source)
 
-    include_patterns = include_patterns or []
-    exclude_patterns = exclude_patterns or []
+    include_patterns = list(include_patterns) or []
+    exclude_patterns = list(exclude_patterns) or []
 
     include_patterns.extend(subdirs_to_patterns(source, include_dirs))
     exclude_patterns.extend(subdirs_to_patterns(source, exclude_dirs))
