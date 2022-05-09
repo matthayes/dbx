@@ -304,8 +304,14 @@ def dbfs(
 @cli.command()
 @common_options
 @click.option("--dest-repo", "-d", type=str, help="REPO in the destination path /Repos/USER/REPO", required=True)
-@click.option("--user", "-u", "user", type=str, help="USER in the destination path /Repos/USER/REPO",
-              default=os.environ.get("DBX_SYNC_REPO_USER"))
+@click.option(
+    "--user",
+    "-u",
+    "user",
+    type=str,
+    help="USER in the destination path /Repos/USER/REPO",
+    default=os.environ.get("DBX_SYNC_REPO_USER"),
+)
 def repo(
     user: str,
     source: str,
