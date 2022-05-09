@@ -280,7 +280,7 @@ class RemoteSyncer:
         matched_paths = {}
         unmatched_paths = {}
         for path, st in snapshot._stat_info.items():
-            if self.matcher.match(path):
+            if self.matcher.match(path, is_directory=snapshot.isdir(path)):
                 matched_paths[path] = st
             else:
                 # Hold on to the unmatched paths, because we may need to include them due to them
@@ -296,7 +296,7 @@ class RemoteSyncer:
             if path.rstrip("/") == self.source.rstrip("/"):
                 continue
             for matched_path in matched_paths:
-                if os.path.commonpath([path, matched_path]) == path:
+                if matched_path.startswith(path) and os.path.commonpath([path, matched_path]) == path:
                     additional_matched_paths[path] = st
 
         # Replace the snapshot's path dictionary with the newly filtered set.
