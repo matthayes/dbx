@@ -17,7 +17,7 @@ def temp_event_handler(*, ignores: List[str] = None, includes: List[str] = None)
     with temporary_directory() as tempdir:
         matcher = PathMatcher(tempdir, includes=includes, ignores=ignores)
         with file_watcher(source=tempdir, matcher=matcher) as event_handler:
-            yield (event_handler, tempdir)
+            yield (event_handler, Path(tempdir))
 
 
 def get_events(event_handler: CollectingEventHandler, expected: int, *, timeout_seconds: int = 5):
