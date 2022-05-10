@@ -2,6 +2,7 @@ import asyncio
 import os
 import time
 from getpass import getuser
+from pathlib import Path
 from typing import List
 
 import click
@@ -154,7 +155,7 @@ def subdirs_to_patterns(source: str, subdirs: List[str]) -> List[str]:
         full_subdir = os.path.join(source, subdir)
         if not os.path.exists(full_subdir):
             raise click.BadArgumentUsage(f"Path {full_subdir} does not exist")
-        subdir = subdir.rstrip("/")
+        subdir = Path(subdir).as_posix()
         patterns.append(f"/{subdir}/")
     return patterns
 
@@ -193,7 +194,7 @@ def handle_source(source: str = None) -> str:
         else:
             raise click.UsageError("Must specify source directory using --source")
 
-    source = os.path.abspath(source).rstrip("/")
+    source = os.path.abspath(source)
 
     dbx_echo(f"Syncing from {source}")
 
