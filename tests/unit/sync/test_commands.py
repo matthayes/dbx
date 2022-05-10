@@ -10,7 +10,6 @@ from tests.unit.utils import invoke_cli_runner
 from .utils import temporary_directory, pushd
 
 
-
 @patch("dbx.commands.sync.get_databricks_config")
 def test_check(mock_get_config):
     invoke_cli_runner(check, [])
