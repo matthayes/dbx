@@ -200,7 +200,7 @@ def test_create_dir_with_file():
         assert len(diff.files_modified) == 0
 
         assert get_relative_path(source, diff.dirs_created[0]) == "foo"
-        assert get_relative_path(source, diff.files_created[0]) == "foo/bar"
+        assert Path(get_relative_path(source, diff.files_created[0])).as_posix() == "foo/bar"
 
 
 def test_move_dir_with_file():
@@ -225,8 +225,8 @@ def test_move_dir_with_file():
 
         assert get_relative_path(source, diff.dirs_deleted[0]) == "foo"
         assert get_relative_path(source, diff.dirs_created[0]) == "foo2"
-        assert get_relative_path(source, diff.files_deleted[0]) == "foo/bar"
-        assert get_relative_path(source, diff.files_created[0]) == "foo2/bar"
+        assert Path(get_relative_path(source, diff.files_deleted[0])).as_posix() == "foo/bar"
+        assert Path(get_relative_path(source, diff.files_created[0])).as_posix() == "foo2/bar"
 
 
 def test_delete_dir_with_file():
@@ -250,7 +250,7 @@ def test_delete_dir_with_file():
         assert len(diff.files_modified) == 0
 
         assert get_relative_path(source, diff.dirs_deleted[0]) == "foo"
-        assert get_relative_path(source, diff.files_deleted[0]) == "foo/bar"
+        assert Path(get_relative_path(source, diff.files_deleted[0])).as_posix() == "foo/bar"
 
 
 def test_replace_dir_with_file():
