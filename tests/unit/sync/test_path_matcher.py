@@ -158,7 +158,7 @@ def test_create_path_matcher():
         (tempdir / "baz").mkdir()
         (tempdir / "baz" / "foo").touch()
 
-        matcher = create_path_matcher(source=tempdir, includes=None, excludes=None)
+        matcher = create_path_matcher(source=tempdir)
 
         assert matcher.match(tempdir / "foo")
         assert matcher.match(tempdir / "foo" / "bar")
@@ -195,7 +195,7 @@ def test_create_path_matcher_with_gitignore():
         (tempdir / "bop").mkdir()
         (tempdir / "bop" / "foo").touch()
 
-        matcher = create_path_matcher(source=tempdir, excludes=["baz"], includes=None)
+        matcher = create_path_matcher(source=tempdir, exclude_dirs=["baz"])
 
         assert matcher.match(tempdir / "foo")
         assert matcher.match(tempdir / "foo" / "bar")
@@ -234,7 +234,7 @@ def test_create_path_matcher_with_syncinclude():
         (tempdir / "bop").mkdir()
         (tempdir / "bop" / "foo").touch()
 
-        matcher = create_path_matcher(source=tempdir, excludes=None, includes=None)
+        matcher = create_path_matcher(source=tempdir)
 
         assert not matcher.match(tempdir / "foo")
         assert not matcher.match(tempdir / "foo" / "bar")
@@ -268,7 +268,7 @@ def test_create_path_matcher_with_syncinclude_and_includes():
         (tempdir / "bop").mkdir()
         (tempdir / "bop" / "foo").touch()
 
-        matcher = create_path_matcher(source=tempdir, excludes=None, includes=["/foo/"])
+        matcher = create_path_matcher(source=tempdir, include_patterns=["/foo/"])
 
         assert matcher.match(tempdir / "foo")
         assert matcher.match(tempdir / "foo" / "bar")

@@ -4,7 +4,7 @@ from unittest.mock import patch, call, MagicMock
 import click
 import pytest
 
-from dbx.commands.sync import dbfs, repo, get_user_name, get_source_base_name
+from dbx.commands.sync import dbfs, repo, get_user_name, get_source_base_name, DEFAULT_IGNORES
 from dbx.sync import DeleteUnmatchedOption
 from dbx.sync.clients import DBFSClient, ReposClient
 
@@ -56,8 +56,10 @@ def test_repo_basic_opts(mock_get_config, mock_main_loop, mock_get_user_name):
         assert mock_main_loop.call_args[1]["source"] == tempdir
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert not mock_main_loop.call_args[1]["dry_run"]
-        assert mock_main_loop.call_args[1]["includes"] == []
-        assert mock_main_loop.call_args[1]["excludes"] == []
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == []
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert mock_main_loop.call_args[1]["matcher"].ignores == DEFAULT_IGNORES
         assert mock_main_loop.call_args[1]["watch"]
         assert (
             mock_main_loop.call_args[1]["delete_unmatched_option"] == DeleteUnmatchedOption.UNSPECIFIED_DELETE_UNMATCHED
@@ -103,8 +105,10 @@ def test_repo_dry_run(mock_get_config, mock_main_loop, mock_get_user_name):
         assert mock_main_loop.call_args[1]["source"] == tempdir
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert mock_main_loop.call_args[1]["dry_run"]
-        assert mock_main_loop.call_args[1]["includes"] == []
-        assert mock_main_loop.call_args[1]["excludes"] == []
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == []
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert mock_main_loop.call_args[1]["matcher"].ignores == DEFAULT_IGNORES
         assert not mock_main_loop.call_args[1]["watch"]
         assert (
             mock_main_loop.call_args[1]["delete_unmatched_option"] == DeleteUnmatchedOption.UNSPECIFIED_DELETE_UNMATCHED
@@ -135,8 +139,10 @@ def test_repo_polling(mock_get_config, mock_main_loop, mock_get_user_name):
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert not mock_main_loop.call_args[1]["dry_run"]
         assert mock_main_loop.call_args[1]["polling_interval_secs"] == 2.0
-        assert mock_main_loop.call_args[1]["includes"] == []
-        assert mock_main_loop.call_args[1]["excludes"] == []
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == []
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert mock_main_loop.call_args[1]["matcher"].ignores == DEFAULT_IGNORES
         assert mock_main_loop.call_args[1]["watch"]
         assert (
             mock_main_loop.call_args[1]["delete_unmatched_option"] == DeleteUnmatchedOption.UNSPECIFIED_DELETE_UNMATCHED
@@ -167,8 +173,10 @@ def test_repo_include_dir(mock_get_config, mock_main_loop, mock_get_user_name):
         assert mock_main_loop.call_args[1]["source"] == tempdir
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert not mock_main_loop.call_args[1]["dry_run"]
-        assert mock_main_loop.call_args[1]["includes"] == ["/foo/"]
-        assert mock_main_loop.call_args[1]["excludes"] == []
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == ["/foo/"]
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert mock_main_loop.call_args[1]["matcher"].ignores == DEFAULT_IGNORES
         assert mock_main_loop.call_args[1]["watch"]
         assert (
             mock_main_loop.call_args[1]["delete_unmatched_option"] == DeleteUnmatchedOption.UNSPECIFIED_DELETE_UNMATCHED
@@ -199,8 +207,10 @@ def test_repo_exclude_dir(mock_get_config, mock_main_loop, mock_get_user_name):
         assert mock_main_loop.call_args[1]["source"] == tempdir
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert not mock_main_loop.call_args[1]["dry_run"]
-        assert mock_main_loop.call_args[1]["includes"] == []
-        assert mock_main_loop.call_args[1]["excludes"] == ["/foo/"]
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == []
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert sorted(mock_main_loop.call_args[1]["matcher"].ignores) == sorted(DEFAULT_IGNORES + ["/foo/"])
         assert mock_main_loop.call_args[1]["watch"]
         assert (
             mock_main_loop.call_args[1]["delete_unmatched_option"] == DeleteUnmatchedOption.UNSPECIFIED_DELETE_UNMATCHED
@@ -249,8 +259,10 @@ def test_repo_inferred_source(mock_get_config, mock_main_loop, mock_get_user_nam
         assert mock_main_loop.call_args[1]["source"] == tempdir
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert not mock_main_loop.call_args[1]["dry_run"]
-        assert mock_main_loop.call_args[1]["includes"] == []
-        assert mock_main_loop.call_args[1]["excludes"] == []
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == []
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert mock_main_loop.call_args[1]["matcher"].ignores == DEFAULT_IGNORES
         assert mock_main_loop.call_args[1]["watch"]
         assert (
             mock_main_loop.call_args[1]["delete_unmatched_option"] == DeleteUnmatchedOption.UNSPECIFIED_DELETE_UNMATCHED
@@ -298,8 +310,10 @@ def test_repo_allow_delete_unmatched(mock_get_config, mock_main_loop, mock_get_u
         assert mock_main_loop.call_args[1]["source"] == tempdir
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert not mock_main_loop.call_args[1]["dry_run"]
-        assert mock_main_loop.call_args[1]["includes"] == []
-        assert mock_main_loop.call_args[1]["excludes"] == []
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == []
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert mock_main_loop.call_args[1]["matcher"].ignores == DEFAULT_IGNORES
         assert mock_main_loop.call_args[1]["watch"]
         assert mock_main_loop.call_args[1]["delete_unmatched_option"] == DeleteUnmatchedOption.ALLOW_DELETE_UNMATCHED
 
@@ -326,8 +340,10 @@ def test_repo_disallow_delete_unmatched(mock_get_config, mock_main_loop, mock_ge
         assert mock_main_loop.call_args[1]["source"] == tempdir
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert not mock_main_loop.call_args[1]["dry_run"]
-        assert mock_main_loop.call_args[1]["includes"] == []
-        assert mock_main_loop.call_args[1]["excludes"] == []
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == []
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert mock_main_loop.call_args[1]["matcher"].ignores == DEFAULT_IGNORES
         assert mock_main_loop.call_args[1]["watch"]
         assert mock_main_loop.call_args[1]["delete_unmatched_option"] == DeleteUnmatchedOption.DISALLOW_DELETE_UNMATCHED
 
@@ -359,8 +375,10 @@ def test_dbfs_no_opts(mock_get_config, mock_main_loop, mock_get_user_name):
         assert mock_main_loop.call_args[1]["source"] == tempdir
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert not mock_main_loop.call_args[1]["dry_run"]
-        assert mock_main_loop.call_args[1]["includes"] == []
-        assert mock_main_loop.call_args[1]["excludes"] == []
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == []
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert mock_main_loop.call_args[1]["matcher"].ignores == DEFAULT_IGNORES
         assert mock_main_loop.call_args[1]["watch"]
 
         client = mock_main_loop.call_args[1]["client"]
@@ -392,8 +410,10 @@ def test_dbfs_polling(mock_get_config, mock_main_loop, mock_get_user_name):
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert not mock_main_loop.call_args[1]["dry_run"]
         assert mock_main_loop.call_args[1]["polling_interval_secs"] == 3.0
-        assert mock_main_loop.call_args[1]["includes"] == []
-        assert mock_main_loop.call_args[1]["excludes"] == []
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == []
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert mock_main_loop.call_args[1]["matcher"].ignores == DEFAULT_IGNORES
         assert mock_main_loop.call_args[1]["watch"]
 
         client = mock_main_loop.call_args[1]["client"]
@@ -424,8 +444,10 @@ def test_dbfs_dry_run(mock_get_config, mock_main_loop, mock_get_user_name):
         assert mock_main_loop.call_args[1]["source"] == tempdir
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert mock_main_loop.call_args[1]["dry_run"]
-        assert mock_main_loop.call_args[1]["includes"] == []
-        assert mock_main_loop.call_args[1]["excludes"] == []
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == []
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert mock_main_loop.call_args[1]["matcher"].ignores == DEFAULT_IGNORES
         assert not mock_main_loop.call_args[1]["watch"]
 
         client = mock_main_loop.call_args[1]["client"]
@@ -453,8 +475,10 @@ def test_dbfs_source_dest(mock_get_config, mock_main_loop, mock_get_user_name):
         assert mock_main_loop.call_args[1]["source"] == tempdir
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert not mock_main_loop.call_args[1]["dry_run"]
-        assert mock_main_loop.call_args[1]["includes"] == []
-        assert mock_main_loop.call_args[1]["excludes"] == []
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == []
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert mock_main_loop.call_args[1]["matcher"].ignores == DEFAULT_IGNORES
         assert mock_main_loop.call_args[1]["watch"]
 
         client = mock_main_loop.call_args[1]["client"]
@@ -485,8 +509,10 @@ def test_dbfs_specify_user(mock_get_config, mock_main_loop, mock_get_user_name):
         assert mock_main_loop.call_args[1]["source"] == tempdir
         assert not mock_main_loop.call_args[1]["full_sync"]
         assert not mock_main_loop.call_args[1]["dry_run"]
-        assert mock_main_loop.call_args[1]["includes"] == []
-        assert mock_main_loop.call_args[1]["excludes"] == []
+        assert mock_main_loop.call_args[1]["matcher"]
+        assert mock_main_loop.call_args[1]["matcher"].includes == []
+        assert mock_main_loop.call_args[1]["matcher"].force_includes == []
+        assert mock_main_loop.call_args[1]["matcher"].ignores == DEFAULT_IGNORES
         assert mock_main_loop.call_args[1]["watch"]
 
         client = mock_main_loop.call_args[1]["client"]
