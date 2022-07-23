@@ -71,7 +71,7 @@ def in_context(path):
         os.chdir(prev_cwd)
 
 
-@pytest.fixture(scope="function", autouse=False)
+@pytest.fixture(scope="function", autouse=True)
 def temp_project(tmp_path: Path) -> Path:
     project_name = "dev_dbx_%s" % str(uuid4()).split("-")[0]
     logging.info("Launching test in directory %s with project name %s" % (tmp_path, project_name))
@@ -84,7 +84,7 @@ def temp_project(tmp_path: Path) -> Path:
         yield project_path
 
 
-@pytest.fixture(scope="session", autouse=False)
+@pytest.fixture(scope="session", autouse=True)
 def mlflow_fixture(session_mocker):
     """
     This fixture provides local instance of mlflow with support for tracking and registry functions.
