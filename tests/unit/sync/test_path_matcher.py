@@ -124,25 +124,35 @@ def test_ignore_spec():
         assert matcher.should_ignore(tempdir / "foo")
 
 
-def test_ignore_and_include_spec():
+def test_ignore_include_and_force_include_spec():
     """
-    Tests that should_ignore can properly follow included and ignored patterns when used together.
+    Tests that match can properly follow included, force included, and ignored patterns when used together.
     """
     with temporary_directory() as tempdir:
         tempdir = Path(tempdir)
 
-        matcher = PathMatcher(tempdir, includes=["foo/"], ignores=["foo/bar/"])
+        matcher = PathMatcher(tempdir, ignores=["foo/"], includes=["wee/"], force_includes=["foo/baz/"])
 
         (tempdir / "foo").mkdir()
         (tempdir / "foo" / "bar").mkdir()
-        (tempdir / "foo" / "baz").mkdir()
         (tempdir / "foo" / "bar" / "bat").touch()
+        (tempdir / "foo" / "bop").touch()
+        (tempdir / "foo" / "baz").mkdir()
+        (tempdir / "foo" / "baz" / "bat").touch()
+        (tempdir / "wee").mkdir()
+        (tempdir / "wee" / "woo").touch()
+        (tempdir / "woo").touch()
 
-        # everything under the foo directory is included except for bar/
-        assert matcher.match(tempdir / "foo")
+        # everything under the foo directory is excluded except for foo/baz/ due to the force include
+        assert not matcher.match(tempdir / "foo")
         assert not matcher.match(tempdir / "foo" / "bar")
         assert not matcher.match(tempdir / "foo" / "bar" / "bat")
+        assert not matcher.match(tempdir / "foo" / "bop")
         assert matcher.match(tempdir / "foo" / "baz")
+        assert matcher.match(tempdir / "foo" / "baz" / "bat")
+        assert matcher.match(tempdir / "wee")
+        assert matcher.match(tempdir / "wee" / "woo")
+        assert not matcher.match(tempdir / "woo")
 
 
 def test_create_path_matcher():

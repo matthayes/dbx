@@ -139,13 +139,13 @@ def create_path_matcher(
     if use_gitignore and os.path.exists(gitignore_path):
         dbx_echo(f"Ignoring patterns from {gitignore_path}")
         with open(gitignore_path, encoding="utf-8") as f:
-            exclude_patterns.extend(f.readlines())
+            exclude_patterns.extend([line.strip() for line in f.readlines()])
 
     syncinclude_path = os.path.join(source, ".syncinclude")
     if not include_patterns and os.path.exists(syncinclude_path):
         dbx_echo(f"Including patterns from {syncinclude_path}")
         with open(syncinclude_path, encoding="utf-8") as f:
-            include_patterns.extend(f.readlines())
+            include_patterns.extend([line.strip() for line in f.readlines()])
 
     exclude_patterns.extend(DEFAULT_IGNORES)
 
